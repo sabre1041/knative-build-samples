@@ -63,8 +63,8 @@ spec:
            mountPath: /var/lib/containers
     - name: push-image
       image: ${BUILDER_IMAGE}
-      commmand: ["/bin/bash","-c","SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) buildah"]
-      args: ["push", "--tls-verify=false", "--debug", "--creds=openshift:${SA_TOKEN}","localhost/$(POD_NAMESPACE)/$(IMAGE_NAME)", "docker://docker-registry.default.svc:5000/$(POD_NAMESPACE)/$(IMAGE_NAME)"]
+      commmand: ["/bin/bash","-c","buildah push --tls-verify=false --creds=openshift:$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) localhost/$(POD_NAMESPACE)/$(IMAGE_NAME) docker://docker-registry.default.svc:5000/$(POD_NAMESPACE)/$(IMAGE_NAME)"]
+      #args: ["push", "--tls-verify=false", "--debug", "--creds=openshift:${SA_TOKEN}","localhost/$(POD_NAMESPACE)/$(IMAGE_NAME)", "docker://docker-registry.default.svc:5000/$(POD_NAMESPACE)/$(IMAGE_NAME)"]
       #args: ["push", "--tls-verify=false", "--creds=uid:pwd","localhost/myproject/${IMAGE_NAME}", "quay.io/mickcos/${IMAGE_NAME}"]
       #args: ["push", "--tls-verify=false", "--creds=admin:tDEz65NBwJ7SCbQxUzP4idbl_cykD1TJXjCGN3B5uoU","localhost/myproject/${IMAGE_NAME}", "docker://docker-registry.default.svc:5000/myproject/${IMAGE_NAME}"]
       env:
