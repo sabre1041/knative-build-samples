@@ -46,7 +46,7 @@ spec:
       #args: ["bud",".", "&& buildah push --tls-verify=false --creds=openshift:$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) docker://docker-registry.default.svc:5000/$POD_NAMESPACE/$IMAGE_NAME"]
       #args: ["bash","-c","/workspace/${BUILDAH_SCRIPT}"]
       #args: ["${BUILDAH_SCRIPT}"]
-      args: ["bud", "-tmyproject/${IMAGE_NAME}", "."]
+      args: ["bud", "-t$(POD_NAMESPACE)/$(IMAGE_NAME)", "."]
       env:
       - name: CONTEXT_DIR
         value: "${CONTEXT_DIR}"
@@ -63,9 +63,17 @@ spec:
            mountPath: /var/lib/containers
     - name: push-image
       image: ${BUILDER_IMAGE}
-      #args: ["push", "--tls-verify=false", "--creds=openshift:$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)","localhost/myproject/${IMAGE_NAME}", "docker://docker-registry.default.svc:5000/myproject/${IMAGE_NAME}"]
-      args: ["push", "--tls-verify=false", "--creds=uid:pwd","localhost/myproject/${IMAGE_NAME}", "quay.io/mickcos/${IMAGE_NAME}"]
+      args: ["push", "--tls-verify=false", "--debug", "--creds=openshift:eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJteXByb2plY3QiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlY3JldC5uYW1lIjoiYnVpbGRlci10b2tlbi1zaHpoaCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJidWlsZGVyIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiOTYxZTYyM2QtNWU0NS0xMWU5LWE3OTMtMDgwMDI3NGE0OTk0Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Om15cHJvamVjdDpidWlsZGVyIn0.C1v_wWUfvv2rCGCPC-baaujwayiCUsETTv6D5YSkRHs3SrGBrHUgBwBHps7TgRihN2xjrasdyUsyC6Wg0IiUJOO-M7Hqr2rrSCBIyAk7gFN_1hqRkp-CIZKQtC2PcXodspzKawQ96GFo0_00wzlmg49d0uV7xRN_TzLti3FbE0ZbYNWQBSp5p1XTVJsQ4h5S5OrBGpJHaqGiNBUPlbArWEXGiGkEOJEaL5_RnDq_KkeBuJkIYCqtBff_atZzl0HqMgcZsAqPXQ-QCFKnz0689ANv4N0n8zjvq1Zx9wfQ9itTjG6K9VZK6kNO-rFujjExFXR4Ag3L2PrKTTjREED6_Q","localhost/$(POD_NAMESPACE)/$(IMAGE_NAME)", "docker://docker-registry.default.svc:5000/$(POD_NAMESPACE)/$(IMAGE_NAME)"]
+      #args: ["push", "--tls-verify=false", "--creds=uid:pwd","localhost/myproject/${IMAGE_NAME}", "quay.io/mickcos/${IMAGE_NAME}"]
       #args: ["push", "--tls-verify=false", "--creds=admin:tDEz65NBwJ7SCbQxUzP4idbl_cykD1TJXjCGN3B5uoU","localhost/myproject/${IMAGE_NAME}", "docker://docker-registry.default.svc:5000/myproject/${IMAGE_NAME}"]
+      env:
+      - name: IMAGE_NAME
+        value: "${IMAGE_NAME}"
+      - name: POD_NAMESPACE
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.namespace
+
       volumeMounts:
          - name: varlibcontainers
            mountPath: /var/lib/containers
